@@ -3,12 +3,15 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 
 import { useEffect, useState } from "react";
+import SignInGate from "./SignInGate";
+import { getCurrentUser } from "../lib/auth";
 import { safeGetItem, safeSetItem } from "../lib/storage";
 
 export default function MovieActions({ movieId }) {
   const [watchLater, setWatchLater] = useState(false);
   const [showCollectionMenu, setShowCollectionMenu] = useState(false);
   const [collections, setCollections] = useState([]);
+  const [gateAction, setGateAction] = useState(null);
 
   useEffect(() => {
     const saved = safeGetItem(`watchLater-${movieId}`, false) === true;
@@ -19,6 +22,11 @@ export default function MovieActions({ movieId }) {
   }, [movieId]);
 
   const toggleWatchLater = () => {
+    if (!getCurrentUser()) {
+      setGateAction("add to Watch Later");
+      return;
+    }
+
     const newValue = !watchLater;
     setWatchLater(newValue);
     safeSetItem(`watchLater-${movieId}`, newValue);
@@ -46,15 +54,24 @@ export default function MovieActions({ movieId }) {
   };
 
   const createCollection = () => {
+    if (!getCurrentUser()) {
+      setGateAction("create a collection");
+      setShowCollectionMenu(false);
+      return;
+    }
+
     const name = prompt("Enter collection name:");
 
     if (!name || !name.trim()) {
       return;
     }
 
+    const user = getCurrentUser();
     const newCollection = {
       id: Date.now(),
       name: name.trim(),
+      creator: user?.name || "You",
+      description: "A hand-picked run of films worth watching in one sitting.",
       movies: [movieId],
       likes: 0,
     };
@@ -85,8 +102,8 @@ export default function MovieActions({ movieId }) {
         </button>
 
         {showCollectionMenu && (
-          <div className="absolute left-0 top-full z-20 mt-2 w-64 rounded-lg border border-[rgba(238,238,238,0.14)] bg-[#17191A] p-2 shadow-[0_16px_32px_rgba(0,0,0,0.4)]">
-            <p className="px-3 py-2 text-[10px] uppercase tracking-[0.22em] text-[#FFD369]">
+          <div className="absolute left-0 top-full z-20 mt-2 w-64 rounded-lg border border-[#252529] bg-[#151518] p-2 shadow-[0_16px_32px_rgba(0,0,0,0.4)]">
+            <p className="px-3 py-2 text-[10px] uppercase tracking-[0.22em] text-[#FF3B78]">
               Add to collection
             </p>
 
@@ -95,7 +112,7 @@ export default function MovieActions({ movieId }) {
                 <button
                   key={collection.id}
                   onClick={() => addToCollection(collection.name)}
-                  className="w-full rounded-md px-3 py-2.5 text-left text-sm text-[#C9C9C9] transition hover:bg-[#222831] hover:text-[#EEEEEE]"
+                  className="w-full rounded-md px-3 py-2.5 text-left text-sm text-[#85858C] transition hover:bg-[#101012] hover:text-[#F5F5F5]"
                 >
                   {collection.name}
                 </button>
@@ -104,13 +121,15 @@ export default function MovieActions({ movieId }) {
             <button
               type="button"
               onClick={createCollection}
-              className="mt-1 w-full rounded-md border-t border-[rgba(238,238,238,0.12)] px-3 py-2.5 text-left text-sm text-[#EEEEEE] transition hover:bg-[#222831] hover:text-[#FFD369]"
+              className="mt-1 w-full rounded-md border-t border-[#252529] px-3 py-2.5 text-left text-sm text-[#F5F5F5] transition hover:bg-[#101012] hover:text-[#FF3B78]"
             >
               + Create new collection
             </button>
           </div>
         )}
       </div>
+
+      <SignInGate open={Boolean(gateAction)} action={gateAction || "continue"} onClose={() => setGateAction(null)} />
     </div>
   );
 }

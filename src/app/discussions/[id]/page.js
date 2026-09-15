@@ -1,13 +1,6 @@
-import Navbar from "../../../components/navbar";
-import DiscussionDetail from "../../../components/DiscussionDetail";
+import { redirect } from "next/navigation";
 
-export default async function DiscussionPage({ params }) {
+export default async function LegacyDiscussionPage({ params }) {
   const { id } = await params;
-
-  return (
-    <main className="fr-page">
-      <Navbar />
-      <DiscussionDetail id={id} />
-    </main>
-  );
+  redirect(`/spaces/discussions/${id}`);
 }

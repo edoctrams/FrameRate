@@ -22,12 +22,12 @@ export default function WatchLaterPage() {
       <Navbar />
 
       <div className="fr-shell">
-        <section className="fr-panel rounded-lg px-8 py-12 sm:px-12">
-          <span className="fr-label">Coming Soon</span>
-          <h1 className="mt-4 text-4xl font-black tracking-normal text-[#EEEEEE] sm:text-5xl">
-            Your Watch Later
+        <section className="px-2 pb-4 pt-12 sm:px-8">
+          <span className="fr-label">Saved For Later</span>
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-[#F5F5F5] sm:text-5xl">
+            Watch Later<span className="text-[#FF3B78]">.</span>
           </h1>
-          <p className="mt-3 max-w-2xl text-base text-[#C9C9C9]">
+          <p className="mt-3 max-w-2xl text-base text-[#85858C]">
             Movies and series you want to revisit later.
           </p>
         </section>

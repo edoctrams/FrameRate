@@ -1,4 +1,5 @@
 import Navbar from "../../components/navbar";
+import SignOutButton from "../../components/SignOutButton";
 
 const profile = {
   name: "Parth",
@@ -29,57 +30,65 @@ export default function ProfilePage() {
       <Navbar />
 
       <div className="fr-shell">
-        <section className="fr-panel rounded-lg px-8 py-10 sm:px-12">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div className="flex items-center gap-5">
-              <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-[#393E46] bg-[#0D0F10] text-2xl font-black text-[#FFD369] shadow-md">
+        <section className="border-b border-[#252529] pb-12 pt-8">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[#252529] bg-[#151518] text-2xl font-black text-[#FF3B78]">
                 P
               </div>
               <div>
-                <h1 className="text-3xl font-black tracking-normal text-[#EEEEEE]">{profile.name}</h1>
-                <p className="text-[#92979D]">{profile.username}</p>
+                <span className="fr-label">Member Profile</span>
+                <h1 className="mt-3 text-4xl font-black tracking-tight text-[#F5F5F5] sm:text-5xl">
+                  {profile.name}
+                </h1>
+                <p className="mt-2 text-sm text-[#55555C]">{profile.username}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center md:min-w-[300px]">
-              {Object.entries(profile.stats).map(([key, value]) => (
-                <div key={key} className="rounded-lg border border-[rgba(238,238,238,0.12)] bg-[#0D0F10] p-3">
-                  <p className="text-xl font-bold text-[#FFD369]">{value}</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#92979D]">{key}</p>
-                </div>
-              ))}
+            <div className="flex items-center gap-3">
+              <div className="grid grid-cols-3 gap-3 text-center md:min-w-[320px]">
+                {Object.entries(profile.stats).map(([key, value]) => (
+                  <div key={key} className="rounded-2xl border border-[#252529] bg-[#151518] p-4">
+                    <p className="text-2xl font-black text-[#FF3B78]">{value}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#55555C]">
+                      {key}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <SignOutButton />
             </div>
           </div>
 
-          <p className="mt-6 max-w-2xl text-base leading-7 text-[#C9C9C9]">{profile.bio}</p>
+          <p className="mt-8 max-w-2xl text-base leading-7 text-[#85858C]">{profile.bio}</p>
         </section>
 
         <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <section className="fr-panel rounded-lg p-6 sm:p-8">
-            <h2 className="text-2xl font-black text-[#EEEEEE]">Recent Reviews</h2>
+          <section className="rounded-2xl border border-[#252529] bg-[#151518] p-6 sm:p-8">
+            <h2 className="text-2xl font-black text-[#F5F5F5]">Recent Reviews</h2>
             <div className="mt-5 space-y-3">
               {recentReviews.map((review) => (
-                <div key={review.title} className="flex items-center justify-between rounded-lg border border-[rgba(238,238,238,0.1)] bg-[#0D0F10] p-4">
+                <div key={review.title} className="flex items-center justify-between rounded-xl border border-[#252529] bg-[#101012] p-4">
                   <div>
-                    <p className="font-semibold text-[#EEEEEE]">{review.title}</p>
-                    <p className="text-xs text-[#92979D]">{review.time}</p>
+                    <p className="font-semibold text-[#F5F5F5]">{review.title}</p>
+                    <p className="text-xs text-[#85858C]">{review.time}</p>
                   </div>
-                  <span className="text-sm font-bold text-[#FFD369]">★ {review.score.toFixed(1)}</span>
+                  <span className="text-sm font-bold text-[#FF3B78]">★ {review.score.toFixed(1)}</span>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="fr-panel rounded-lg p-6 sm:p-8">
-            <h2 className="text-2xl font-black text-[#EEEEEE]">Recent Collections</h2>
+          <section className="rounded-2xl border border-[#252529] bg-[#151518] p-6 sm:p-8">
+            <h2 className="text-2xl font-black text-[#F5F5F5]">Recent Collections</h2>
             <div className="mt-5 space-y-3">
               {recentCollections.map((collection) => (
-                <div key={collection.name} className="flex items-center justify-between rounded-lg border border-[rgba(238,238,238,0.1)] bg-[#0D0F10] p-4">
+                <div key={collection.name} className="flex items-center justify-between rounded-xl border border-[#252529] bg-[#101012] p-4">
                   <div>
-                    <p className="font-semibold text-[#EEEEEE]">{collection.name}</p>
-                    <p className="text-xs text-[#92979D]">{collection.count} movies</p>
+                    <p className="font-semibold text-[#F5F5F5]">{collection.name}</p>
+                    <p className="text-xs text-[#85858C]">{collection.count} movies</p>
                   </div>
-                  <span className="text-sm text-[#FFD369]">↗</span>
+                  <span className="text-sm text-[#FF3B78]">↗</span>
                 </div>
               ))}
             </div>

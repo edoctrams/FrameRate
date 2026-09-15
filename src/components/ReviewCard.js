@@ -3,6 +3,8 @@
 import { useState } from "react";
 import AdvancedReview from "./AdvancedReview";
 import { CURRENT_USER } from "../lib/reviews";
+import { getRatingMeaning } from "../lib/rating";
+import { safeGetItem, safeSetItem } from "../lib/storage";
 
 function formatDate(isoString) {
   if (!isoString) return "";
@@ -20,10 +22,7 @@ function StarRating({ rating }) {
 
   for (let i = 1; i <= 10; i++) {
     stars.push(
-      <span
-        key={i}
-        className={i <= fullStars ? "text-[#FFD369]" : "text-[#393E46]"}
-      >
+      <span key={i} className={i <= fullStars ? "text-[#FF3B78]" : "text-[#252529]"}>
         ★
       </span>
     );
@@ -34,90 +33,175 @@ function StarRating({ rating }) {
 
 export default function ReviewCard({ review, onEdit, onDelete }) {
   const [revealed, setRevealed] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [reported, setReported] = useState(false);
+
   const isCurrentUser = review.username === CURRENT_USER;
   const isSpoiler = review.containsSpoilers;
+  const meaning = getRatingMeaning(review.overallRating);
+
+  const reportReview = (reason) => {
+    const reports = safeGetItem("spoiler-reports", []);
+    const alreadyReported = reports.some((item) => item.reviewId === review.id);
+    if (!alreadyReported) {
+      safeSetItem("spoiler-reports", [
+        ...reports,
+        {
+          reviewId: review.id,
+          movieId: review.movieId,
+          reason,
+          note: reason === "spoiler" ? "This review contains an unmarked spoiler." : "",
+          reportedAt: new Date().toISOString(),
+        },
+      ]);
+    }
+    setReported(true);
+    setMenuOpen(false);
+  };
 
   return (
-    <article className="rounded-lg border border-[rgba(238,238,238,0.12)] bg-[#17191A] p-6 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#393E46] bg-[#0D0F10] text-sm font-bold text-[#FFD369]">
-              {review.username?.charAt(0)?.toUpperCase() || "U"}
-            </div>
-            <div>
-              <p className="text-sm font-bold text-[#EEEEEE]">
-                {review.username}
-                {isCurrentUser && (
-                  <span className="ml-2 rounded-md bg-[#FFD369]/12 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#FFD369]">
-                    You
-                  </span>
-                )}
-              </p>
-              <p className="text-xs text-[#92979D]">{formatDate(review.createdAt)}</p>
-            </div>
+    <article className="relative rounded-2xl border border-[#252529] bg-[#151518] p-6 transition duration-300 hover:border-[#FF3B78]/40 sm:p-7">
+      {/* Header row: the action menu lives here and is pinned to the card's
+          top-right. It is a sibling of the review text, never part of it, so a
+          one-line review and a ten-line review put ••• in the same place. */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#252529] bg-[#080808] text-sm font-bold text-[#FF3B78]">
+            {review.username?.charAt(0)?.toUpperCase() || "U"}
+          </div>
+          <div className="min-w-0">
+            <p className="flex flex-wrap items-center gap-2 text-sm font-bold text-[#F5F5F5]">
+              {review.username}
+              {isCurrentUser && (
+                <span className="rounded-full bg-[#FF3B78]/12 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#FF3B78]">
+                  You
+                </span>
+              )}
+              {review.hasAdvancedReview && (
+                <span className="rounded-full bg-[#FF3B78] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-[#F5F5F5]">
+                  Advanced Reviewer
+                </span>
+              )}
+            </p>
+            <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#55555C]">
+              <span>{formatDate(review.createdAt)}</span>
+              <span aria-hidden className="text-[#2E2E34]">
+                ·
+              </span>
+              <span className="font-semibold uppercase tracking-[0.12em] text-[#B52F67]">
+                {meaning.label}
+              </span>
+            </p>
           </div>
         </div>
 
-        <div className="text-right">
-          <span className="inline-block rounded-md bg-[#FFD369] px-3 py-1 text-sm font-bold text-[#0D0F10]">
-            {Number(review.overallRating).toFixed(1)}/10
-          </span>
-          <div className="mt-2">
-            <StarRating rating={Number(review.overallRating)} />
+        <div className="flex shrink-0 items-start gap-3">
+          <div className="text-right">
+            <span className="inline-block rounded-full border border-[#FF3B78]/40 bg-[#FF3B78]/10 px-3 py-1 text-sm font-bold text-[#FF3B78]">
+              {Number(review.overallRating).toFixed(1)}/10
+            </span>
+            <div className="mt-2 hidden sm:block">
+              <StarRating rating={Number(review.overallRating)} />
+            </div>
+          </div>
+
+          <div className="relative">
+            <button
+              type="button"
+              aria-label="Review actions"
+              onClick={() => setMenuOpen((open) => !open)}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-[#252529] bg-[#080808] text-lg leading-none text-[#85858C] transition hover:border-[#FF3B78]/50 hover:text-[#FF3B78]"
+            >
+              •••
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 top-11 z-20 w-48 overflow-hidden rounded-xl border border-[#252529] bg-[#101012] py-1 shadow-[0_18px_40px_rgba(0,0,0,0.5)]">
+                {isCurrentUser ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onEdit?.(review);
+                      }}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] transition hover:bg-[#151518] hover:text-[#FF3B78]"
+                    >
+                      Edit Review
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        onDelete?.(review);
+                      }}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] transition hover:bg-[#151518] hover:text-[#FF3B78]"
+                    >
+                      Delete Review
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => reportReview("spoiler")}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] transition hover:bg-[#151518] hover:text-[#FF3B78]"
+                    >
+                      Report Spoiler
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => reportReview("review")}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-[#F5F5F5] transition hover:bg-[#151518] hover:text-[#FF3B78]"
+                    >
+                      Report Review
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {isSpoiler && !revealed ? (
-        <div className="mt-5 rounded-lg border border-[#FFD369]/60 bg-[#FFD369]/10 p-4">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-[#FFD369]">
-              Spoiler Review
-            </p>
-          </div>
-          <p className="mt-2 text-sm text-[#C9C9C9]">
-            This review contains spoilers.
-          </p>
-          <button
-            type="button"
-            onClick={() => setRevealed(true)}
-            className="mt-3 rounded-md bg-[#FFD369] px-4 py-2 text-sm font-semibold text-[#0D0F10] transition hover:bg-[#ffdf85]"
-          >
-            Reveal Review
-          </button>
-        </div>
-      ) : (
-        <p className="mt-5 leading-7 text-[#C9C9C9]">{review.text}</p>
+      {reported && (
+        <p className="mt-4 rounded-xl border border-[#252529] bg-[#101012] px-4 py-3 text-xs text-[#85858C]">
+          Thanks — this review has been reported to the Frame Rate team.
+        </p>
       )}
 
-      {isSpoiler && revealed && (
-        <p className="mt-2 text-xs text-[#92979D]">
-          This review contains spoilers.
-        </p>
+      {isSpoiler && !revealed ? (
+        <div className="mt-5 overflow-hidden rounded-xl border border-[#FF3B78]/50 bg-[#FF3B78]/8">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#FF3B78]">
+                ⚠ Spoiler Review
+              </p>
+              <p className="mt-1 text-xs text-[#85858C]">
+                This review contains spoilers.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRevealed(true)}
+              className="rounded-full bg-[#FF3B78] px-4 py-2 text-xs font-semibold text-[#F5F5F5] transition hover:bg-[#ff5c92]"
+            >
+              Reveal Review
+            </button>
+          </div>
+          <p className="select-none px-5 pb-5 text-sm leading-7 text-[#85858C] blur-[6px]">
+            {review.text}
+          </p>
+        </div>
+      ) : (
+        <>
+          <p className="mt-5 leading-7 text-[#85858C]">{review.text}</p>
+          {isSpoiler && <p className="mt-3 text-xs text-[#FF3B78]">Contains spoilers.</p>}
+        </>
       )}
 
       {review.hasAdvancedReview && review.advancedRatings && (
         <AdvancedReview ratings={review.advancedRatings} />
-      )}
-
-      {isCurrentUser && (
-        <div className="mt-5 flex items-center gap-3 border-t border-[rgba(238,238,238,0.1)] pt-4">
-          <button
-            type="button"
-            onClick={() => onEdit(review)}
-            className="rounded-md border border-[rgba(238,238,238,0.14)] bg-[#0D0F10] px-3 py-1.5 text-xs font-medium text-[#C9C9C9] transition hover:border-[#FFD369]/50 hover:text-[#FFD369]"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(review)}
-            className="rounded-md border border-[rgba(238,238,238,0.14)] bg-[#0D0F10] px-3 py-1.5 text-xs font-medium text-[#C9C9C9] transition hover:border-[#FFD369]/50 hover:text-[#FFD369]"
-          >
-            Delete
-          </button>
-        </div>
       )}
     </article>
   );

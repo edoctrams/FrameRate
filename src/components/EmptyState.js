@@ -8,10 +8,10 @@ export default function EmptyState({
   secondaryAction,
 }) {
   return (
-    <div className="fr-panel mt-16 rounded-lg p-12 text-center">
+    <div className="fr-panel mt-16 rounded-2xl p-12 text-center">
       <span className="fr-label">Frame Rate</span>
-      <h2 className="mt-5 text-2xl font-bold text-[#EEEEEE]">{title}</h2>
-      <p className="mt-3 text-[#92979D]">{description}</p>
+      <h2 className="mt-5 text-2xl font-bold text-[#F5F5F5]">{title}</h2>
+      <p className="mt-3 text-[#85858C]">{description}</p>
 
       {actionLabel && (
         <Link

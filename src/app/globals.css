@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d0f10;
-  --background-soft: #17191a;
-  --background-card: #17191a;
-  --foreground: #eeeeee;
-  --foreground-secondary: #c9c9c9;
-  --accent: #ffd369;
-  --accent-soft: rgba(255, 211, 105, 0.12);
-  --line: rgba(238, 238, 238, 0.12);
-  --muted: #92979d;
-  --charcoal: #222831;
-  --charcoal-soft: #393e46;
+  --background: #080808;
+  --background-soft: #151518;
+  --background-card: #151518;
+  --foreground: #F5F5F5;
+  --foreground-secondary: #85858C;
+  --accent: #FF3B78;
+  --accent-soft: rgba(255, 59, 120, 0.12);
+  --line: #252529;
+  --muted: #55555C;
+  --charcoal: #101012;
+  --charcoal-soft: #252529;
 }
 
 @theme inline {
@@ -39,7 +39,7 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(238, 238, 238, 0.035) 0.6px, transparent 0.7px);
+  background-image: radial-gradient(rgba(245, 245, 245, 0.035) 0.6px, transparent 0.7px);
   background-size: 6px 6px;
   opacity: 0.35;
   z-index: 1;
@@ -69,7 +69,7 @@ img {
 .fr-page {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(255, 211, 105, 0.035), transparent 18rem),
+    linear-gradient(180deg, rgba(255, 59, 120, 0.035), transparent 18rem),
     var(--background);
   color: var(--foreground);
 }
@@ -87,7 +87,7 @@ img {
   border-radius: 0.75rem;
   border: 1px solid var(--line);
   background:
-    linear-gradient(135deg, rgba(34, 40, 49, 0.96), rgba(23, 25, 26, 0.95) 55%, rgba(13, 15, 16, 0.98)),
+    linear-gradient(135deg, rgba(24, 8, 16, 0.96), rgba(16, 16, 18, 0.95) 55%, rgba(8, 8, 8, 0.98)),
     var(--background-card);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
 }
@@ -133,14 +133,14 @@ img {
   transition: all 0.2s ease;
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #0d0f10;
+  color: #f5f5f5;
 }
 
 .fr-button:hover {
-  background: #ffdf85;
-  border-color: #ffdf85;
+  background: #ff5c92;
+  border-color: #ff5c92;
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(255, 211, 105, 0.2);
+  box-shadow: 0 10px 22px rgba(255, 59, 120, 0.2);
 }
 
 .fr-button-secondary {
@@ -153,13 +153,13 @@ img {
   font-size: 0.9rem;
   transition: all 0.2s ease;
   border: 1px solid var(--line);
-  background: rgba(238, 238, 238, 0.04);
+  background: rgba(245, 245, 245, 0.04);
   color: var(--foreground);
 }
 
 .fr-button-secondary:hover {
-  border-color: rgba(255, 211, 105, 0.45);
-  background: rgba(255, 211, 105, 0.08);
+  border-color: rgba(255, 59, 120, 0.45);
+  background: rgba(255, 59, 120, 0.08);
   color: var(--accent);
 }
 
@@ -174,14 +174,14 @@ img {
   transition: all 0.2s ease;
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #0d0f10;
+  color: #f5f5f5;
 }
 
 .fr-button-accent:hover {
-  background: #ffdf85;
-  border-color: #ffdf85;
+  background: #ff5c92;
+  border-color: #ff5c92;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 211, 105, 0.3);
+  box-shadow: 0 4px 12px rgba(255, 59, 120, 0.3);
 }
 
 input[type="range"] {
