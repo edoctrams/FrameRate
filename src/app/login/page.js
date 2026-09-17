@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "../../lib/auth";
+import { loginUser } from "../../lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   return (
     <main className="fr-page relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-12">
@@ -37,12 +39,20 @@ export default function LoginPage() {
           </div>
 
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              signIn({ name: email.split("@")[0] || "Parth", email });
+
+              setError("");
+
+              const { error } = await loginUser(email, password);
+
+              if (error) {
+                setError(error.message);
+                return;
+              }
+
               router.push("/dashboard-new");
             }}
-            className="space-y-5"
           >
             <div>
               <label htmlFor="email" className="mb-2 block text-sm font-medium text-[#85858C]">
@@ -73,6 +83,8 @@ export default function LoginPage() {
                 <input
                   id="password"
                   type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
                   className="h-12 w-full rounded-lg border border-[#252529] bg-[#080808] px-4 pr-12 text-sm text-[#F5F5F5] placeholder:text-[#85858C] outline-none transition focus:border-[#FF3B78] focus:ring-2 focus:ring-[#FF3B78]/20"
@@ -88,6 +100,12 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+            
+            {error && (
+              <p className="text-sm text-[#FF3B78]">
+                {error}
+              </p>
+            )}
 
             <button type="submit" className="fr-button h-12 w-full">
               Log In

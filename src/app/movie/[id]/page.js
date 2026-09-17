@@ -2,12 +2,12 @@ import Link from "next/link";
 import MovieActions from "../../../components/MovieActions";
 import Navbar from "../../../components/navbar";
 import ReviewSection from "../../../components/ReviewSection";
-import { getMovieById, getRatingLabel } from "../../../data/movies";
+import { getMovieByIdFromSupabase } from "../../../lib/movies";
+import { getRatingLabel } from "../../../data/movies";
 
 export default async function MoviePage({ params }) {
   const { id } = await params;
-  const movie = getMovieById(id);
-
+  const movie = await getMovieByIdFromSupabase(id);
   if (!movie) {
     return (
       <main className="fr-page">
@@ -80,7 +80,9 @@ export default async function MoviePage({ params }) {
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-4">
-              <span className="text-4xl font-black text-[#FF3B78]">★ {movie.rating.toFixed(1)}</span>
+              <span className="text-4xl font-black text-[#FF3B78]">
+                  ★ {rating.toFixed(1)}
+              </span>
               <span className="rounded-full border border-[#FF3B78]/40 bg-[#FF3B78]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#FF3B78]">
                 {ratingLabel}
               </span>

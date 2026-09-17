@@ -35,10 +35,12 @@ export default function ReviewSection({ movieId, movieTitle }) {
     }
   }, [reviews, filter]);
 
-  const loadReviews = () => {
-    const stored = getReviewsForMovie(movieId);
+  const loadReviews = async () => {
+    const stored = await getReviewsForMovie(movieId);
+    const reviewStats = await getReviewStats(movieId);
+
     setReviews(stored);
-    setStats(getReviewStats(movieId));
+    setStats(reviewStats);
   };
 
   useEffect(() => {
@@ -46,8 +48,10 @@ export default function ReviewSection({ movieId, movieTitle }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [movieId]);
 
-  const openForm = () => {
-    if (!getCurrentUser()) {
+  const openForm = async () => {
+    const user = await getCurrentUser();
+
+    if (!user) {
       setShowGate(true);
       return;
     }
@@ -56,8 +60,10 @@ export default function ReviewSection({ movieId, movieTitle }) {
     setShowForm(true);
   };
 
-  const openEditForm = (review) => {
-    if (!getCurrentUser()) {
+  const openEditForm = async (review) => {
+    const user = await getCurrentUser();
+
+    if (!user) {
       setShowGate(true);
       return;
     }
@@ -71,15 +77,27 @@ export default function ReviewSection({ movieId, movieTitle }) {
     setEditingReview(null);
   };
 
-  const handleSave = (review) => {
-    saveReview(review);
-    loadReviews();
+  const handleSave = async (review) => {
+    const result = await saveReview(review);
+
+    if (result.error) {
+      console.error("Error saving review:", result.error);
+      return;
+    }
+
+    await loadReviews();
     closeForm();
   };
 
-  const handleDelete = (review) => {
-    deleteReview(movieId, review.id);
-    loadReviews();
+  const handleDelete = async (review) => {
+    const result = await deleteReview(movieId, review.id);
+
+    if (result.error) {
+      console.error("Error deleting review:", result.error);
+      return;
+    }
+
+    await loadReviews();
   };
 
   return (

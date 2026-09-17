@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdvancedReview from "./AdvancedReview";
-import { CURRENT_USER } from "../lib/reviews";
+import { supabase } from "../lib/supabase";
+import { reportReview as saveReport } from "../lib/reviews";
 import { getRatingMeaning } from "../lib/rating";
 import { safeGetItem, safeSetItem } from "../lib/storage";
 
@@ -35,26 +36,34 @@ export default function ReviewCard({ review, onEdit, onDelete }) {
   const [revealed, setRevealed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [reported, setReported] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
-  const isCurrentUser = review.username === CURRENT_USER;
+  useEffect(() => {
+    async function loadUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setCurrentUserId(user?.id || null);
+    }
+
+    loadUser();
+  }, []);
+
+  const isCurrentUser = review.userId === currentUserId;  
+
+  
   const isSpoiler = review.containsSpoilers;
   const meaning = getRatingMeaning(review.overallRating);
 
-  const reportReview = (reason) => {
-    const reports = safeGetItem("spoiler-reports", []);
-    const alreadyReported = reports.some((item) => item.reviewId === review.id);
-    if (!alreadyReported) {
-      safeSetItem("spoiler-reports", [
-        ...reports,
-        {
-          reviewId: review.id,
-          movieId: review.movieId,
-          reason,
-          note: reason === "spoiler" ? "This review contains an unmarked spoiler." : "",
-          reportedAt: new Date().toISOString(),
-        },
-      ]);
+  const reportReview = async (reason) => {
+    const result = await saveReport(review.id, reason);
+
+    if (result.error) {
+      console.error("Error reporting review:", result.error);
+      return;
     }
+
     setReported(true);
     setMenuOpen(false);
   };

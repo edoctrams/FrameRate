@@ -19,7 +19,12 @@ export default function Navbar() {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    setSignedIn(Boolean(getCurrentUser()));
+    async function checkUser() {
+      const user = await getCurrentUser();
+      setSignedIn(Boolean(user));
+    }
+
+    checkUser();
   }, [pathname]);
 
   const isActive = (item) => {

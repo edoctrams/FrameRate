@@ -1,13 +1,11 @@
+
 import Navbar from "../../components/navbar";
 import Link from "next/link";
 import MovieCard from "../../components/MovieCard";
-import { movies } from "../../data/movies";
+import { getMovies } from "../../lib/movies";
 
-const trending = [
-  { movie: movies.find((m) => m.title === "Interstellar"), interested: "22.1K" },
-  { movie: movies.find((m) => m.title === "The Dark Knight"), interested: "18.8K" },
-  { movie: movies.find((m) => m.title === "Oppenheimer") ?? movies[5], interested: "18.4K" },
-].filter((row) => row.movie);
+
+
 
 const platforms = [
   { name: "Netflix", description: "Big hits, binge-worthy picks, and trending watches" },
@@ -41,7 +39,14 @@ function TrendingRow({ index, movie, interested }) {
   );
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const movies = await getMovies();
+  const trending = [
+    { movie: movies.find((m) => m.title === "Interstellar"), interested: "22.1K" },
+    { movie: movies.find((m) => m.title === "The Dark Knight"), interested: "18.8K" },
+    { movie: movies.find((m) => m.title === "Oppenheimer") ?? movies[5], interested: "18.4K" },
+  ].filter((row) => row.movie);
+  
   return (
     <main className="fr-page">
       <Navbar />

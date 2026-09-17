@@ -1,13 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Navbar from "../../components/navbar";
 import MovieCard from "../../components/MovieCard";
-import { movies } from "../../data/movies";
+import { getMovies } from "../../lib/movies";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState("Content");
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchMovies() {
+      const data = await getMovies();
+      setMovies(data);
+      setLoading(false);
+    }
+
+    fetchMovies();
+  }, []);
 
   const tabs = ["Content", "Collections", "Cast & Crew", "Users"];
 
@@ -25,8 +37,18 @@ export default function SearchPage() {
         movie.type.toLowerCase().includes(searchText)
       );
     });
-  }, [query]);
+  }, [query, movies]);
 
+  if (loading) {
+    return (
+      <main className="fr-page">
+        <Navbar />
+        <div className="fr-shell p-8">
+          <p className="text-[#85858C]">Loading movies...</p>
+        </div>
+      </main>
+    );
+  }
   return (
     <main className="fr-page">
       <Navbar />

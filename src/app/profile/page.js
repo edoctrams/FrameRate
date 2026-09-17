@@ -1,16 +1,10 @@
+"use client";
+import { useEffect, useState } from "react";
 import Navbar from "../../components/navbar";
 import SignOutButton from "../../components/SignOutButton";
+import { supabase } from "../../lib/supabase";
 
-const profile = {
-  name: "Parth",
-  username: "@parth",
-  bio: "Movie lover chasing the next great watch and talking through every twist.",
-  stats: {
-    reviews: 18,
-    collections: 5,
-    discussions: 9,
-  },
-};
+
 
 const recentReviews = [
   { title: "Interstellar", score: 9.2, time: "2 days ago" },
@@ -25,6 +19,46 @@ const recentCollections = [
 ];
 
 export default function ProfilePage() {
+  const [profileData, setProfileData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadProfile() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) {
+        console.error("Error loading profile:", error);
+      } else {
+        setProfileData(data);
+      }
+
+      setLoading(false);
+    }
+
+    loadProfile();
+  }, []);
+
+  if (loading) {
+    return <p className="p-8 text-[#F5F5F5]">Loading profile...</p>;
+  }
+
+  if (!profileData) {
+    return <p className="p-8 text-[#F5F5F5]">Profile not found.</p>;
+  }
+
   return (
     <main className="fr-page">
       <Navbar />
@@ -39,28 +73,32 @@ export default function ProfilePage() {
               <div>
                 <span className="fr-label">Member Profile</span>
                 <h1 className="mt-3 text-4xl font-black tracking-tight text-[#F5F5F5] sm:text-5xl">
-                  {profile.name}
+                  {profileData.display_name || profileData.username}
                 </h1>
-                <p className="mt-2 text-sm text-[#55555C]">{profile.username}</p>
+                <p className="mt-2 text-sm text-[#55555C]">@{profileData.username}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="grid grid-cols-3 gap-3 text-center md:min-w-[320px]">
-                {Object.entries(profile.stats).map(([key, value]) => (
-                  <div key={key} className="rounded-2xl border border-[#252529] bg-[#151518] p-4">
-                    <p className="text-2xl font-black text-[#FF3B78]">{value}</p>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#55555C]">
-                      {key}
-                    </p>
-                  </div>
-                ))}
+                {Object.entries({
+                  reviews: 0,
+                  collections: 0,
+                  discussions: 0,
+                }).map(([key, value]) => (
+                    <div key={key} className="rounded-2xl border border-[#252529] bg-[#151518] p-4">
+                      <p className="text-2xl font-black text-[#FF3B78]">{value}</p>
+                      <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-[#55555C]">
+                        {key}
+                      </p>
+                    </div>
+                  ))}
               </div>
               <SignOutButton />
             </div>
           </div>
 
-          <p className="mt-8 max-w-2xl text-base leading-7 text-[#85858C]">{profile.bio}</p>
+          <p className="mt-8 max-w-2xl text-base leading-7 text-[#85858C]">Welcome to your FrameRate profile.</p>
         </section>
 
         <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">

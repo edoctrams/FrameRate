@@ -44,15 +44,13 @@ export default function ReviewForm({ movieId, movieTitle, initialReview, onClose
     }
 
     const review = {
-      id: initialReview?.id || Date.now(),
+      ...(initialReview?.id && { id: initialReview.id }),
       movieId: String(movieId),
-      username: initialReview?.username || "Parth",
       overallRating: rating,
       text: text.trim(),
       containsSpoilers: spoiler,
       hasAdvancedReview: advancedEnabled,
       advancedRatings: advancedEnabled ? { ...advanced } : null,
-      createdAt: initialReview?.createdAt || new Date().toISOString(),
     };
 
     onSave(review);

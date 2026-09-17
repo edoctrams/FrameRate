@@ -2,9 +2,15 @@
 
 /* eslint-disable react-hooks/set-state-in-effect */
 
+import { getCollections,addMovieToCollection,createCollection as createCollectionInSupabase} from "../lib/collections";
 import { useEffect, useState } from "react";
 import SignInGate from "./SignInGate";
 import { getCurrentUser } from "../lib/auth";
+import {
+  addToWatchlist,
+  removeFromWatchlist,
+  isInWatchlist,
+} from "../lib/watchlist";
 import { safeGetItem, safeSetItem } from "../lib/storage";
 
 export default function MovieActions({ movieId }) {
@@ -14,47 +20,63 @@ export default function MovieActions({ movieId }) {
   const [gateAction, setGateAction] = useState(null);
 
   useEffect(() => {
-    const saved = safeGetItem(`watchLater-${movieId}`, false) === true;
-    setWatchLater(saved);
+    let active = true;
 
-    const savedCollections = safeGetItem("collections", []);
-    setCollections(savedCollections);
+    async function loadData() {
+      const saved = await isInWatchlist(movieId);
+      const savedCollections = await getCollections();
+      if (active) {
+        setWatchLater(saved);
+        setCollections(savedCollections);
+      }
+    }
+
+    loadData();
+
+    return () => {
+      active = false;
+    };
   }, [movieId]);
 
-  const toggleWatchLater = () => {
-    if (!getCurrentUser()) {
+  const toggleWatchLater = async () => {
+    const user = await getCurrentUser();
+
+    if (!user) {
       setGateAction("add to Watch Later");
       return;
     }
 
-    const newValue = !watchLater;
-    setWatchLater(newValue);
-    safeSetItem(`watchLater-${movieId}`, newValue);
+    let result;
+
+    if (watchLater) {
+      result = await removeFromWatchlist(movieId);
+    } else {
+      result = await addToWatchlist(movieId);
+    }
+
+    if (result.error) {
+      console.error("Watchlist error:", result.error);
+      return;
+    }
+
+    setWatchLater(!watchLater);
   };
 
-  const addToCollection = (collectionName) => {
-    const updatedCollections = collections.map((collection) => {
-      if (collection.name !== collectionName) {
-        return collection;
-      }
+  const addToCollection = async (collectionId) => {
+    const result = await addMovieToCollection(collectionId, movieId);
 
-      if (collection.movies.includes(movieId)) {
-        return collection;
-      }
+    if (result.error) {
+      console.error("Error adding movie to collection:", result.error);
+      return;
+    } 
 
-      return {
-        ...collection,
-        movies: [...collection.movies, movieId],
-      };
-    });
-
-    setCollections(updatedCollections);
-    safeSetItem("collections", updatedCollections);
     setShowCollectionMenu(false);
   };
 
-  const createCollection = () => {
-    if (!getCurrentUser()) {
+  const createCollection = async () => {
+    const user = await getCurrentUser();
+
+    if (!user) {
       setGateAction("create a collection");
       setShowCollectionMenu(false);
       return;
@@ -66,19 +88,19 @@ export default function MovieActions({ movieId }) {
       return;
     }
 
-    const user = getCurrentUser();
-    const newCollection = {
-      id: Date.now(),
+    const result = await createCollectionInSupabase({
       name: name.trim(),
-      creator: user?.name || "You",
-      description: "A hand-picked run of films worth watching in one sitting.",
-      movies: [movieId],
-      likes: 0,
-    };
+      description:
+        "A hand-picked run of films worth watching in one sitting.",
+      movieId,
+    });
 
-    const updatedCollections = [...collections, newCollection];
-    setCollections(updatedCollections);
-    safeSetItem("collections", updatedCollections);
+    if (result.error) {
+      console.error("Error creating collection:", result.error);
+      return;
+    }
+
+    setCollections([...collections, result.data]);
     setShowCollectionMenu(false);
   };
 
@@ -111,7 +133,7 @@ export default function MovieActions({ movieId }) {
               collections.map((collection) => (
                 <button
                   key={collection.id}
-                  onClick={() => addToCollection(collection.name)}
+                  onClick={() => addToCollection(collection.id)}
                   className="w-full rounded-md px-3 py-2.5 text-left text-sm text-[#85858C] transition hover:bg-[#101012] hover:text-[#F5F5F5]"
                 >
                   {collection.name}

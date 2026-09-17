@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "../../lib/auth";
+import { registerUser } from "../../lib/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (password !== confirmPassword) {
@@ -25,7 +25,19 @@ export default function RegisterPage() {
     }
 
     setError("");
-    signIn({ name: name.trim() || username.trim() || "Parth", email });
+
+    const { error } = await registerUser({
+      name,
+      username,
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
     router.push("/dashboard-new");
   };
 
