@@ -11,7 +11,7 @@ const navItems = [
   { href: "/dashboard-new", label: "Explore" },
   { href: "/spaces", label: "Spaces", also: ["/discussions"] },
   { href: "/collections", label: "Collections" },
-  { href: "/watch-later", label: "Watch Later" },
+  { href: "/watchlist", label: "Watch Later" },
 ];
 
 export default function Navbar() {

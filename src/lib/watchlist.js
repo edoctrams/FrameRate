@@ -1,59 +1,136 @@
 import { supabase } from "./supabase";
 
-export async function addToWatchlist(movieId) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { error: new Error("You must be signed in.") };
-  }
+// ADD MOVIE
+export async function addToWatchlist(movie){
 
-  const { error } = await supabase.from("watchlist").insert({
-    user_id: user.id,
-    movie_id: Number(movieId),
-  });
+    try {
 
-  return { error };
+        const res = await fetch("/api/watchlist", {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                movie_id: movie.id,
+                title: movie.title,
+                poster: movie.poster,
+                year: movie.year,
+                rating: movie.rating,
+                genre: movie.genre,
+                duration: movie.duration,
+                platform: movie.platform,
+                description: movie.description
+            })
+        });
+
+
+        const data = await res.json();
+
+
+        if(!res.ok){
+            return {
+                data:null,
+                error:data.error
+            };
+        }
+
+
+        return {
+            data,
+            error:null
+        };
+
+
+    } catch(error){
+
+        return {
+            data:null,
+            error:error.message
+        };
+
+    }
+
 }
 
-export async function removeFromWatchlist(movieId) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    return { error: new Error("You must be signed in.") };
-  }
 
-  const { error } = await supabase
-    .from("watchlist")
-    .delete()
-    .eq("user_id", user.id)
-    .eq("movie_id", Number(movieId));
 
-  return { error };
+
+// REMOVE MOVIE
+export async function removeFromWatchlist(movieId){
+
+    try{
+
+        const res = await fetch("/api/watchlist",{
+            method:"DELETE",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                movie_id:movieId
+            })
+        });
+
+
+        const data = await res.json();
+
+
+        if(!res.ok){
+            return {
+                data:null,
+                error:data.error
+            };
+        }
+
+
+        return {
+            data,
+            error:null
+        };
+
+
+    }catch(error){
+
+        return {
+            data:null,
+            error:error.message
+        };
+
+    }
+
 }
-export async function isInWatchlist(movieId) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    return false;
-  }
 
-  const { data, error } = await supabase
-    .from("watchlist")
-    .select("movie_id")
-    .eq("user_id", user.id)
-    .eq("movie_id", Number(movieId))
-    .maybeSingle();
 
-  if (error) {
-    console.error("Error checking watchlist:", error);
-    return false;
-  }
 
-  return Boolean(data);
+
+// CHECK IF MOVIE EXISTS
+export async function isInWatchlist(movieId){
+
+    try {
+
+        const res = await fetch("/api/watchlist");
+
+        const data = await res.json();
+
+        if(!Array.isArray(data)){
+            return false;
+        }
+
+
+        return data.some(
+            item => Number(item.movie_id) === Number(movieId)
+        );
+
+
+    } catch(error){
+
+        console.error(
+            "Watchlist check error:",
+            error
+        );
+
+        return false;
+    }
 }

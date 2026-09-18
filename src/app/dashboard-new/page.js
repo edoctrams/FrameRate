@@ -1,4 +1,4 @@
-
+import { getTMDBMovies } from "../../lib/tmdbMovies";
 import Navbar from "../../components/navbar";
 import Link from "next/link";
 import MovieCard from "../../components/MovieCard";
@@ -16,7 +16,7 @@ const platforms = [
 function TrendingRow({ index, movie, interested }) {
   return (
     <Link
-      href={`/movie/${movie.id}`}
+      href={`/movies/${movie.id}`}
       className="group flex items-center gap-4 rounded-xl border border-transparent px-4 py-2.5 transition-colors duration-300 hover:border-[#252529] hover:bg-[#151518] sm:gap-5 sm:px-5"
     >
       <span className="w-8 text-xl font-black leading-none text-[#55555C] transition-colors duration-300 group-hover:text-[#FF3B78] sm:text-2xl">
@@ -40,7 +40,16 @@ function TrendingRow({ index, movie, interested }) {
 }
 
 export default async function DashboardPage() {
-  const movies = await getMovies();
+  const supabaseMovies = await getMovies();
+
+  const tmdbMovies = await getTMDBMovies();
+  console.log("TMDB MOVIES:", tmdbMovies);
+
+
+  const movies = [
+      ...supabaseMovies,
+      ...tmdbMovies
+  ];
   const trending = [
     { movie: movies.find((m) => m.title === "Interstellar"), interested: "22.1K" },
     { movie: movies.find((m) => m.title === "The Dark Knight"), interested: "18.8K" },

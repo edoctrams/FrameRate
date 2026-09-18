@@ -15,7 +15,7 @@ export default function MovieCard({ movie }) {
 
   return (
     <Link
-      href={`/movie/${movie.id}`}
+      href={`/movies/${movie.id}`}
       className="group block"
     >
       <div className="relative aspect-[2/3] overflow-hidden rounded-xl border border-[#252529] shadow-[0_18px_36px_rgba(0,0,0,0.3)] transition duration-300 group-hover:-translate-y-1 group-hover:border-[#FF3B78]/55">
