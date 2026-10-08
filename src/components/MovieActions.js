@@ -2,7 +2,11 @@
 
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import { getCollections,addMovieToCollection,createCollection as createCollectionInSupabase} from "../lib/collections";
+import {
+  getCollections,
+  addMovieToCollection,
+  createCollection as createCollectionInSupabase,
+} from "../lib/collections";
 import { useEffect, useState } from "react";
 import SignInGate from "./SignInGate";
 import { getCurrentUser } from "../lib/auth";
@@ -19,12 +23,16 @@ export default function MovieActions({ movieId }) {
   const [collections, setCollections] = useState([]);
   const [gateAction, setGateAction] = useState(null);
 
+  // Message shown when collection action has a problem
+  const [collectionMessage, setCollectionMessage] = useState("");
+
   useEffect(() => {
     let active = true;
 
     async function loadData() {
       const saved = await isInWatchlist(movieId);
       const savedCollections = await getCollections();
+
       if (active) {
         setWatchLater(saved);
         setCollections(savedCollections);
@@ -55,6 +63,10 @@ export default function MovieActions({ movieId }) {
     }
 
     if (result.error) {
+      if (result.error.message === "Movie is already in Watch Later.") {
+        return;
+      }
+
       console.error("Watchlist error:", result.error);
       return;
     }
@@ -63,14 +75,31 @@ export default function MovieActions({ movieId }) {
   };
 
   const addToCollection = async (collectionId) => {
+    // Clear any previous message
+    setCollectionMessage("");
+
     const result = await addMovieToCollection(collectionId, movieId);
 
     if (result.error) {
-      console.error("Error adding movie to collection:", result.error);
-      return;
-    } 
+      // Movie is already in this collection
+      if (result.error.message === "Movie is already in this collection.") {
+        setCollectionMessage("Movie is already in this collection.");
+      } else {
+        console.error("Error adding movie to collection:", result.error);
+        setCollectionMessage("Could not add movie to collection.");
+      }
 
+      return;
+    }
+
+    // Successfully added
+    setCollectionMessage("Movie added to collection.");
     setShowCollectionMenu(false);
+
+    // Hide success message after 2 seconds
+    setTimeout(() => {
+      setCollectionMessage("");
+    }, 2000);
   };
 
   const createCollection = async () => {
@@ -97,11 +126,17 @@ export default function MovieActions({ movieId }) {
 
     if (result.error) {
       console.error("Error creating collection:", result.error);
+      setCollectionMessage("Could not create collection.");
       return;
     }
 
     setCollections([...collections, result.data]);
+    setCollectionMessage("Collection created successfully.");
     setShowCollectionMenu(false);
+
+    setTimeout(() => {
+      setCollectionMessage("");
+    }, 2000);
   };
 
   return (
@@ -117,7 +152,10 @@ export default function MovieActions({ movieId }) {
       <div className="relative">
         <button
           type="button"
-          onClick={() => setShowCollectionMenu(!showCollectionMenu)}
+          onClick={() => {
+            setShowCollectionMenu(!showCollectionMenu);
+            setCollectionMessage("");
+          }}
           className="fr-button-secondary"
         >
           + Collection
@@ -133,6 +171,7 @@ export default function MovieActions({ movieId }) {
               collections.map((collection) => (
                 <button
                   key={collection.id}
+                  type="button"
                   onClick={() => addToCollection(collection.id)}
                   className="w-full rounded-md px-3 py-2.5 text-left text-sm text-[#85858C] transition hover:bg-[#101012] hover:text-[#F5F5F5]"
                 >
@@ -151,7 +190,17 @@ export default function MovieActions({ movieId }) {
         )}
       </div>
 
-      <SignInGate open={Boolean(gateAction)} action={gateAction || "continue"} onClose={() => setGateAction(null)} />
+      {collectionMessage && (
+        <p className="w-full text-sm text-[#85858C]">
+          {collectionMessage}
+        </p>
+      )}
+
+      <SignInGate
+        open={Boolean(gateAction)}
+        action={gateAction || "continue"}
+        onClose={() => setGateAction(null)}
+      />
     </div>
   );
 }

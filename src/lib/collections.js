@@ -16,6 +16,7 @@ export async function createCollection({
     };
   }
 
+  // Create the collection
   const { data: collection, error: collectionError } = await supabase
     .from("collections")
     .insert({
@@ -27,9 +28,14 @@ export async function createCollection({
     .single();
 
   if (collectionError) {
-    return { data: null, error: collectionError };
+    console.error("Error creating collection:", collectionError);
+    return {
+      data: null,
+      error: collectionError,
+    };
   }
 
+  // Add the first movie to the new collection
   const { error: movieError } = await supabase
     .from("collection_movies")
     .insert({
@@ -38,11 +44,20 @@ export async function createCollection({
     });
 
   if (movieError) {
-    return { data: null, error: movieError };
+    console.error("Error adding movie to new collection:", movieError);
+    return {
+      data: null,
+      error: movieError,
+    };
   }
 
-  return { data: collection, error: null };
+  return {
+    data: collection,
+    error: null,
+  };
 }
+
+
 export async function getCollections() {
   const {
     data: { user },
@@ -65,18 +80,52 @@ export async function getCollections() {
 
   return data;
 }
+
+
 export async function addMovieToCollection(collectionId, movieId) {
+  const collection = Number(collectionId);
+  const movie = Number(movieId);
+
+  // Check whether the movie is already in this collection
+  const { data: existingMovie, error: checkError } = await supabase
+    .from("collection_movies")
+    .select("collection_id, movie_id")
+    .eq("collection_id", collection)
+    .eq("movie_id", movie)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error("Error checking collection:", checkError);
+
+    return {
+      error: checkError,
+    };
+  }
+
+  // Movie is already present
+  if (existingMovie) {
+    return {
+      error: new Error("Movie is already in this collection."),
+    };
+  }
+
+  // Add movie to collection
   const { error } = await supabase
     .from("collection_movies")
     .insert({
-      collection_id: Number(collectionId),
-      movie_id: Number(movieId),
+      collection_id: collection,
+      movie_id: movie,
     });
 
   if (error) {
     console.error("Error adding movie to collection:", error);
-    return { error };
+
+    return {
+      error,
+    };
   }
 
-  return { error: null };
+  return {
+    error: null,
+  };
 }

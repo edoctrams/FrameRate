@@ -13,14 +13,34 @@ export default function SearchPage() {
 
   useEffect(() => {
     async function fetchMovies() {
-      const data = await getMovies();
-      setMovies(data);
-      setLoading(false);
+      try {
+        const url = query.trim()
+          ? `/api/movies/search?q=${encodeURIComponent(query)}`
+          : "/api/movies/search";
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          console.error("Search API error:", response.status);
+          setMovies([]);
+          return;
+        }
+
+        const data = await response.json();
+
+        setMovies(data.results || []);
+      } catch (error) {
+        console.error("Search request failed:", error);
+        setMovies([]);
+      }
     }
 
-    fetchMovies();
-  }, []);
+    const timer = setTimeout(() => {
+      fetchMovies();
+    }, 500);
 
+    return () => clearTimeout(timer);
+  }, [query]);
   const tabs = ["Content", "Collections", "Cast & Crew", "Users"];
 
   const filteredMovies = useMemo(() => {
