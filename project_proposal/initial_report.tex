@@ -1,0 +1,701 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{parskip}
+\usepackage{longtable}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue
+}
+
+\titleformat{\section}
+    {\large\bfseries}
+    {\thesection}
+    {0.6em}
+    {}
+
+\titleformat{\subsection}
+    {\normalsize\bfseries}
+    {\thesubsection}
+    {0.6em}
+    {}
+
+\setlist[itemize]{
+    leftmargin=1.5em,
+    itemsep=3pt,
+    topsep=3pt
+}
+
+\setlist[enumerate]{
+    leftmargin=1.7em,
+    itemsep=4pt,
+    topsep=3pt
+}
+
+\begin{document}
+
+% ---------------------------------------------------------
+% TITLE
+% ---------------------------------------------------------
+
+\begin{center}
+
+{\Large \textbf{Moctale-Inspired Social Movie Discovery and Review Platform}}
+
+\vspace{6pt}
+
+{\normalsize Project Proposal for UCS503P}
+
+\vspace{10pt}
+
+\textbf{Submitted to:} Dr. Raghav B. Venkataramaiyer
+
+Thapar Institute of Engineering and Technology
+
+\vspace{8pt}
+
+\textbf{Student:} Parth Kapoor
+
+\textbf{Roll No.:} [ENTER ROLL NUMBER]
+
+\textbf{Date:} [ENTER DATE]
+
+\end{center}
+
+
+% ---------------------------------------------------------
+% 1
+% ---------------------------------------------------------
+
+\section{1. Higher-order Goal}
+
+This project aims to develop a web-based social movie discovery and discussion platform inspired by the core ideas of Moctale. The platform will combine movie discovery, structured reviews, user collections, social interaction, community discussions, and personalized movie discovery into a single system.
+
+The primary engineering objective is to develop a functional, maintainable, and deployable software application that demonstrates practical skills in frontend development, backend development, database design, API development, authentication, data management, and community-based features.
+
+The initial implementation will focus on a simple and reliable architecture. Advanced technologies such as machine learning, caching, CI/CD, and other scalability-oriented components may be incorporated later if specific project requirements justify their use.
+
+
+% ---------------------------------------------------------
+% 2
+% ---------------------------------------------------------
+
+\section{2. Problem Statement}
+
+Movie discovery platforms generally provide information, ratings, and reviews, but users often have limited ways to express different aspects of their experience with a film. A single numerical rating does not fully describe whether a movie was strong in areas such as cinematography, story, acting, pacing, or music.
+
+In addition, users may want to discuss current movie-related events such as newly released trailers, announcements, casting updates, upcoming movies, or other topics. Conventional review systems do not necessarily provide a dedicated community environment where such discussions can develop and become visible according to user engagement.
+
+The proposed system addresses these limitations through:
+
+\begin{itemize}
+
+    \item Movie discovery and search functionality.
+
+    \item A structured review system with an overall rating from 1--10.
+
+    \item Additional ratings for individual movie aspects such as cinematography, story, acting, direction, pacing, music, and visual effects.
+
+    \item User watchlists and custom movie collections.
+
+    \item User-created discussion forums.
+
+    \item Platform-provided discussion topics based on recent movie-related events such as trailer launches, announcements, casting news, and upcoming releases.
+
+    \item An engagement-based trending discussion system.
+
+    \item Social interaction through likes, comments, and user profiles.
+
+    \item A basic logic-based recommendation system that can later be extended if required.
+
+\end{itemize}
+
+
+% ---------------------------------------------------------
+% 3
+% ---------------------------------------------------------
+
+\section{3. Proposed Solution}
+
+\subsection{3.1 Overview}
+
+We propose a full-stack web application containing the following major components:
+
+\begin{itemize}
+
+    \item \textbf{Movie Discovery:}
+    Users can search for movies and filter them using information such as title, genre, language, release year, and ratings.
+
+    \item \textbf{Movie Profiles:}
+    Each movie will have a dedicated page containing movie information, ratings, reviews, and related discussions.
+
+    \item \textbf{Structured Review System:}
+    Users can provide an overall rating from 1--10 and optionally provide separate ratings for different aspects of the movie.
+
+    \item \textbf{Watchlist and Collections:}
+    Users can save movies to a watchlist and create custom collections such as ``Best Sci-Fi Movies'', ``Movies to Watch'', or ``Favourite Directors''.
+
+    \item \textbf{Social Features:}
+    Users can maintain profiles, follow other users, interact with reviews, and participate in discussions.
+
+    \item \textbf{Community Discussions:}
+    Users can create discussions on any movie-related topic. The platform will also provide selected discussion topics based on recent movie events.
+
+    \item \textbf{Trending Discussions:}
+    Discussions will be ranked according to engagement and recency so that active and relevant discussions become more visible.
+
+    \item \textbf{Basic Recommendation System:}
+    The initial recommendation system will use logical rules based on user ratings, genres, watch history, and other available movie information.
+
+    \item \textbf{Administration and Moderation:}
+    Administrative functionality may be provided for managing discussions, reviews, users, and reported content.
+
+\end{itemize}
+
+
+\subsection{3.2 Core User Workflow}
+
+The proposed user workflow is:
+
+\begin{enumerate}
+
+    \item A user registers or logs into the platform.
+
+    \item The user searches for a movie or discovers movies through the home page.
+
+    \item The user opens a movie's profile page to view information, ratings, reviews, and discussions.
+
+    \item The user can add the movie to a watchlist or collection.
+
+    \item After watching the movie, the user can provide an overall rating from 1--10.
+
+    \item The user can optionally provide ratings for individual aspects such as cinematography, story, acting, direction, pacing, music, and visual effects.
+
+    \item The user can write a detailed review.
+
+    \item The user can participate in an existing discussion or create a new discussion on a topic of their choice.
+
+    \item The platform can also provide discussion prompts related to recent events such as a newly released trailer, movie announcement, casting announcement, or upcoming release.
+
+    \item Users can comment on discussions and interact with them.
+
+    \item Discussions with high engagement can appear in the trending section.
+
+    \item User activity can be used by the recommendation logic to suggest relevant movies.
+
+\end{enumerate}
+
+
+% ---------------------------------------------------------
+% 4
+% ---------------------------------------------------------
+
+\section{4. Structured Review and Rating System}
+
+A central feature of the platform will be a multi-dimensional movie review system.
+
+Instead of restricting users to a conventional star-based rating, the platform will provide an overall rating scale from \textbf{1 to 10}.
+
+Users can additionally rate individual aspects of a movie.
+
+For example:
+
+\begin{center}
+
+\begin{tabular}{|p{4.5cm}|c|}
+\hline
+\textbf{Aspect} & \textbf{Rating} \\
+\hline
+Overall & 9/10 \\
+Cinematography & 9/10 \\
+Story & 8/10 \\
+Acting & 9/10 \\
+Direction & 9/10 \\
+Pacing & 7/10 \\
+Music/Sound & 8/10 \\
+Visual Effects & 10/10 \\
+\hline
+
+\end{tabular}
+
+\end{center}
+
+The aspect-wise ratings will allow the system to display a more detailed representation of the community's opinion.
+
+For example, a movie may have:
+
+\begin{itemize}
+
+    \item Overall Score: 8.6/10
+    \item Cinematography: 9.2/10
+    \item Story: 8.1/10
+    \item Acting: 8.8/10
+    \item Pacing: 7.0/10
+
+\end{itemize}
+
+This allows users to understand not only whether a movie is well received but also \textit{why} it is well received.
+
+The aspect ratings will initially be implemented using straightforward database calculations and aggregation. More advanced analytical methods may be considered in future iterations if required.
+
+
+% ---------------------------------------------------------
+% 5
+% ---------------------------------------------------------
+
+\section{5. Community Discussion and Forum System}
+
+A major component of the platform will be a community discussion system.
+
+The discussion system will support two main types of discussions.
+
+\subsection{5.1 User-Created Discussions}
+
+Users will be able to create discussions on new topics of their choice.
+
+For example:
+
+\begin{itemize}
+
+    \item ``What did you think about the ending of Inception?''
+
+    \item ``Best Christopher Nolan movie?''
+
+    \item ``Is the new Superman movie worth watching?''
+
+    \item ``What are your expectations from the next Avengers movie?''
+
+\end{itemize}
+
+A user-created discussion will contain information such as:
+
+\begin{itemize}
+
+    \item Discussion title.
+
+    \item Discussion description/body.
+
+    \item Associated movie, if applicable.
+
+    \item Category or tag.
+
+    \item Creator.
+
+    \item Creation date and time.
+
+    \item Number of likes/upvotes.
+
+    \item Number of comments.
+
+\end{itemize}
+
+
+\subsection{5.2 Platform-Provided Discussion Topics}
+
+The platform will also provide selected discussion topics based on current or recent movie-related events.
+
+Examples include:
+
+\begin{itemize}
+
+    \item Newly released movie trailers.
+
+    \item Major movie announcements.
+
+    \item Casting announcements.
+
+    \item Upcoming movie releases.
+
+    \item New posters or teasers.
+
+    \item Major franchise announcements.
+
+    \item Important developments related to popular films.
+
+\end{itemize}
+
+For example, when a new trailer is released, the platform can create or highlight a discussion topic such as:
+
+\begin{quote}
+
+\textbf{New Trailer Discussion: What are your expectations from the upcoming movie?}
+
+\end{quote}
+
+Users can then participate in the discussion through comments and interactions.
+
+This creates an active community around both user-generated topics and current movie events.
+
+
+% ---------------------------------------------------------
+% 6
+% ---------------------------------------------------------
+
+\section{6. Trending Discussion System}
+
+The platform will contain a dedicated trending section for discussions.
+
+The purpose of the trending system is to make highly active and relevant discussions more visible to users.
+
+A discussion's trending score will initially be calculated using simple logic based on:
+
+\begin{itemize}
+
+    \item Number of likes/upvotes.
+
+    \item Number of comments.
+
+    \item Recent activity.
+
+    \item Age of the discussion.
+
+    \item Engagement generated within a recent time window.
+
+\end{itemize}
+
+A simplified conceptual formula may be:
+
+\[
+TrendingScore =
+w_1(Likes) +
+w_2(Comments) +
+w_3(RecentActivity) -
+w_4(Age)
+\]
+
+where the weights will be determined and adjusted during development.
+
+The purpose of including recency is to ensure that an old discussion with accumulated engagement does not permanently dominate the trending section.
+
+For example:
+
+\begin{itemize}
+
+    \item A discussion created two hours ago with 500 interactions may become highly trending.
+
+    \item A discussion created two months ago with 2,000 old interactions may gradually lose its position.
+
+\end{itemize}
+
+The initial implementation will use a logic-based ranking system. More sophisticated ranking techniques can be introduced later if the scale or requirements justify them.
+
+
+% ---------------------------------------------------------
+% 7
+% ---------------------------------------------------------
+
+\section{7. Basic Movie Recommendation System}
+
+The initial version of the platform will not depend on a machine learning model.
+
+Instead, recommendations will be generated using logical rules based on available user and movie information.
+
+Possible inputs include:
+
+\begin{itemize}
+
+    \item Genres the user frequently rates highly.
+
+    \item Movies added to the watchlist.
+
+    \item Movies already watched.
+
+    \item Directors frequently watched by the user.
+
+    \item Actors frequently watched by the user.
+
+    \item User ratings.
+
+    \item Similar movie metadata.
+
+\end{itemize}
+
+For example:
+
+\begin{quote}
+
+If a user frequently rates science-fiction and thriller movies highly, the system can prioritize highly rated movies belonging to those genres.
+
+\end{quote}
+
+This approach will provide a functional recommendation system without introducing unnecessary complexity at the beginning.
+
+If future requirements indicate that simple rules are insufficient, a machine learning recommendation model can be incorporated as an extension.
+
+
+% ---------------------------------------------------------
+% 8
+% ---------------------------------------------------------
+
+\section{8. Web Architecture}
+
+The initial system will use a straightforward web architecture.
+
+\begin{itemize}
+
+    \item \textbf{Frontend:}
+    A React/Next.js-based frontend will provide the user interface for movie discovery, profiles, reviews, collections, and discussions.
+
+    \item \textbf{Backend:}
+    The backend technology will be selected according to the requirements and implementation needs of individual features. A simple REST-based backend architecture will initially be used.
+
+    \item \textbf{Database:}
+    A relational database such as PostgreSQL will store users, movies, reviews, ratings, collections, discussions, comments, and other application data.
+
+\end{itemize}
+
+The architecture will remain modular so that additional technologies can be introduced later when they provide a clear benefit.
+
+For example:
+
+\begin{itemize}
+
+    \item A dedicated backend framework can be introduced if backend complexity increases.
+
+    \item WebSockets can be introduced if real-time discussion functionality becomes necessary.
+
+    \item Redis or another caching mechanism can be introduced if database load or response time becomes a significant concern.
+
+    \item Machine learning can be introduced if the recommendation requirements exceed the capabilities of the initial logic-based approach.
+
+\end{itemize}
+
+
+% ---------------------------------------------------------
+% 9
+% ---------------------------------------------------------
+
+\section{9. Software Engineering Practices}
+
+The project will emphasize maintainable and modular software development.
+
+The development process will include:
+
+\begin{itemize}
+
+    \item Version control using Git.
+
+    \item Modular frontend components.
+
+    \item Structured backend APIs.
+
+    \item Relational database design.
+
+    \item Input validation.
+
+    \item Authentication and authorization.
+
+    \item Error handling.
+
+    \item Pagination for large lists such as reviews and discussions.
+
+    \item Database indexing for frequently searched information.
+
+    \item Unit and integration testing for important functionality.
+
+\end{itemize}
+
+Advanced CI/CD infrastructure is not part of the initial project scope. It may be added in a future iteration if required.
+
+
+% ---------------------------------------------------------
+% 10
+% ---------------------------------------------------------
+
+\section{10. Scalability Considerations}
+
+The first version will prioritize correctness, usability, and maintainability rather than premature optimization.
+
+The system will nevertheless be designed with future scalability in mind through:
+
+\begin{itemize}
+
+    \item Separation between frontend and backend.
+
+    \item Efficient database queries.
+
+    \item Pagination.
+
+    \item Database indexing.
+
+    \item Modular application structure.
+
+    \item Clear separation of application responsibilities.
+
+\end{itemize}
+
+Load balancing and distributed infrastructure are not part of the initial implementation. If the application is later deployed at a significantly larger scale, multiple backend instances and a load balancer can be introduced.
+
+Similarly, caching will only be introduced if performance measurements indicate that it is required.
+
+
+% ---------------------------------------------------------
+% 11
+% ---------------------------------------------------------
+
+\section{11. Evaluation Criteria}
+
+The project will be evaluated using measurable functional and system-level metrics.
+
+\subsection{11.1 Primary Metrics}
+
+\begin{itemize}
+
+    \item Successful completion of core user workflows.
+
+    \item Accuracy and consistency of movie ratings and review aggregation.
+
+    \item Responsiveness of movie search and discussion pages.
+
+    \item Relevance of logic-based movie recommendations.
+
+    \item Effectiveness of the trending discussion ranking.
+
+\end{itemize}
+
+
+\subsection{11.2 Secondary Metrics}
+
+\begin{itemize}
+
+    \item Average API response time.
+
+    \item Database query performance.
+
+    \item Number of active discussions.
+
+    \item User engagement with discussions.
+
+    \item Number of comments and interactions per discussion.
+
+    \item Distribution of aspect-wise movie ratings.
+
+\end{itemize}
+
+
+% ---------------------------------------------------------
+% 12
+% ---------------------------------------------------------
+
+\section{12. Project Scope and Deliverables}
+
+\subsection{12.1 Initial Deliverable}
+
+The initial version will include:
+
+\begin{itemize}
+
+    \item User registration and login.
+
+    \item User profiles.
+
+    \item Movie search and movie details.
+
+    \item Watchlist.
+
+    \item Custom movie collections.
+
+    \item Overall 1--10 movie rating.
+
+    \item Aspect-wise ratings.
+
+    \item Written reviews.
+
+    \item Comments and interactions.
+
+    \item User-created discussions.
+
+    \item Platform-provided discussion topics.
+
+    \item Basic trending discussion system.
+
+    \item Basic logic-based movie recommendations.
+
+\end{itemize}
+
+
+\subsection{12.2 Future Deliverables}
+
+Depending on project requirements and available development time, future iterations may include:
+
+\begin{itemize}
+
+    \item Advanced recommendation algorithms.
+
+    \item Machine learning-based recommendations.
+
+    \item Review sentiment analysis.
+
+    \item Real-time discussion using WebSockets.
+
+    \item Redis-based caching.
+
+    \item Notification systems.
+
+    \item Advanced moderation tools.
+
+    \item More sophisticated trending algorithms.
+
+    \item CI/CD automation.
+
+    \item Horizontal scaling and load balancing.
+
+\end{itemize}
+
+
+% ---------------------------------------------------------
+% 13
+% ---------------------------------------------------------
+
+\section{13. Risks and Mitigations}
+
+\begin{itemize}
+
+    \item \textbf{Scope Growth:}
+    The project will be developed incrementally. Core movie, review, and discussion functionality will be completed before advanced extensions.
+
+    \item \textbf{Technology Complexity:}
+    Technologies will be introduced only when required by a feature instead of adding infrastructure without a clear need.
+
+    \item \textbf{Recommendation Quality:}
+    The initial recommendation system will use transparent rule-based logic. More advanced approaches can be evaluated later.
+
+    \item \textbf{Trending Manipulation:}
+    Basic restrictions, rate limiting, and moderation can be introduced to reduce artificial engagement.
+
+    \item \textbf{Inappropriate Content:}
+    Users will have the ability to report discussions, reviews, and comments. Administrative moderation can be added to manage reported content.
+
+    \item \textbf{Performance:}
+    Database indexing and pagination will be prioritized before introducing caching or distributed infrastructure.
+
+\end{itemize}
+
+
+% ---------------------------------------------------------
+% 14
+% ---------------------------------------------------------
+
+\section{14. Summary}
+
+This project proposes a social movie discovery and discussion platform inspired by Moctale.
+
+The system will combine movie discovery with a structured review system in which users provide an overall rating from 1--10 and can additionally rate aspects such as cinematography, story, acting, direction, pacing, music, and visual effects.
+
+A major component of the project will be the community discussion system. Users will be able to create discussions on new topics, while the platform will also provide discussion topics around current movie events such as newly released trailers, movie announcements, casting updates, and upcoming releases.
+
+Discussions will be ranked using engagement and recency so that active conversations can appear in a dedicated trending section.
+
+The initial recommendation system will be based on straightforward logic using user preferences, ratings, watchlists, and movie metadata. Machine learning will remain a future extension rather than a mandatory component.
+
+Similarly, caching, CI/CD, load balancing, and a specific backend framework such as FastAPI will not be mandatory in the initial implementation. These technologies can be introduced later if particular features, performance requirements, or project scale justify them.
+
+The project therefore focuses first on building a complete, usable, and well-structured software system while maintaining enough flexibility to introduce more advanced technologies in future iterations.
+
+\end{document}
